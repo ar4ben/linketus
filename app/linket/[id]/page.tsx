@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { deleteSlotAction, signInWithGoogle } from "@/app/actions";
+import { deleteSlotAction } from "@/app/actions";
 import { SlotClient } from "@/components/slot-client";
 import { Button } from "@/components/ui/button";
 import { getCheckInsBySlotId, getSlotById } from "@/lib/data";
@@ -19,7 +19,7 @@ export default async function SlotPage({ params }: SlotPageProps) {
   const locale = await getServerLocale();
   const strings = getDictionary(locale);
 
-  const [slot, checkIns] = await Promise.all([getSlotById(id), getCheckInsBySlotId(id)]);
+  const slot = await getSlotById(id);
 
   if (!slot) {
     notFound();
@@ -30,7 +30,25 @@ export default async function SlotPage({ params }: SlotPageProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let hasJoined = false;
+  let checkIns = [] as Awaited<ReturnType<typeof getCheckInsBySlotId>>;
+
+  if (user) {
+    const { count } = await supabase
+      .from("check_ins")
+      .select("id", { head: true, count: "exact" })
+      .eq("slot_id", id)
+      .eq("user_id", user.id);
+
+    hasJoined = (count ?? 0) > 0;
+  }
+
+  if (hasJoined) {
+    checkIns = await getCheckInsBySlotId(id);
+  }
+
   const deleteAction = deleteSlotAction.bind(null, slot.id);
+  const signInUrl = `/auth/signin?next=${encodeURIComponent(`/linket/${id}`)}`;
 
   return (
     <section className="space-y-4">
@@ -40,14 +58,6 @@ export default async function SlotPage({ params }: SlotPageProps) {
         </p>
 
         <div className="flex items-center gap-2">
-          {!user ? (
-            <form action={signInWithGoogle}>
-              <Button type="submit" size="sm">
-                {strings.nav.signIn}
-              </Button>
-            </form>
-          ) : null}
-
           {user?.id === slot.creator_id ? (
             <form action={deleteAction}>
               <Button type="submit" size="sm" variant="destructive">
@@ -62,6 +72,8 @@ export default async function SlotPage({ params }: SlotPageProps) {
         slot={slot}
         initialCheckIns={checkIns}
         currentUserId={user?.id ?? null}
+        hasJoined={hasJoined}
+        signInUrl={signInUrl}
         locale={locale}
         strings={strings.slot}
       />

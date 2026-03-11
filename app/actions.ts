@@ -153,7 +153,7 @@ export async function createSlotAction(
     return { error: error.message };
   }
 
-  redirect(`/slot/${data.id}`);
+  redirect(`/linket/${data.id}`);
 }
 
 export async function deleteSlotAction(slotId: string) {
@@ -197,7 +197,7 @@ export async function checkInAction(
   const emoji = String(formData.get("emoji") ?? "");
 
   if (!slotId || !emoji) {
-    return { error: "Slot and emoji are required" };
+    return { error: "Linket and emoji are required" };
   }
 
   if (!ALLOWED_EMOJIS.includes(emoji as (typeof ALLOWED_EMOJIS)[number])) {
@@ -211,10 +211,14 @@ export async function checkInAction(
   });
 
   if (error) {
+    if (error.message.includes("Cooldown active")) {
+      return { error: "One emoji per minute is available" };
+    }
+
     return { error: error.message };
   }
 
-  revalidatePath(`/slot/${slotId}`);
+  revalidatePath(`/linket/${slotId}`);
   revalidatePath("/dashboard");
 
   await sendPushAfterCheckIn({

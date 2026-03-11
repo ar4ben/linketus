@@ -51,7 +51,7 @@ export function SlotList({ slots, locale, emptyLabel, openLabel, slotStrings }: 
 
             <div className="mt-3">
               <Button asChild variant="outline" size="sm">
-                <Link href={`/slot/${slot.id}`}>{openLabel}</Link>
+                <Link href={`/linket/${slot.id}`}>{openLabel}</Link>
               </Button>
             </div>
           </article>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -17,6 +18,8 @@ type SlotClientProps = {
   slot: Slot;
   initialCheckIns: CheckIn[];
   currentUserId: string | null;
+  hasJoined: boolean;
+  signInUrl: string;
   locale: Locale;
   strings: Dictionary[Locale]["slot"];
 };
@@ -39,6 +42,8 @@ export function SlotClient({
   slot,
   initialCheckIns,
   currentUserId,
+  hasJoined,
+  signInUrl,
   locale,
   strings,
 }: SlotClientProps) {
@@ -47,6 +52,7 @@ export function SlotClient({
 
   const [now, setNow] = useState(() => new Date(slot.start_at).getTime());
   const [checkIns, setCheckIns] = useState(initialCheckIns);
+  const [canViewParticipants, setCanViewParticipants] = useState(hasJoined);
   const [actionError, setActionError] = useState<string | null>(null);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -72,6 +78,7 @@ export function SlotClient({
 
   const cooldownSeconds = cooldownUntil ? Math.max(0, Math.ceil((cooldownUntil - now) / 1000)) : 0;
   const canCheckIn = Boolean(currentUserId) && state === "active" && cooldownSeconds === 0 && !isPending;
+  const checkInTitle = currentUserId && canViewParticipants ? strings.joined : strings.checkIn;
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
@@ -83,6 +90,14 @@ export function SlotClient({
   }, [initialCheckIns]);
 
   useEffect(() => {
+    setCanViewParticipants(hasJoined);
+  }, [hasJoined]);
+
+  useEffect(() => {
+    if (!canViewParticipants) {
+      return;
+    }
+
     const channel = supabase
       .channel(`slot-${slot.id}`)
       .on(
@@ -127,7 +142,7 @@ export function SlotClient({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [supabase, slot.id, currentUserId]);
+  }, [supabase, slot.id, currentUserId, canViewParticipants]);
 
   async function onCheckIn(emoji: string) {
     startTransition(async () => {
@@ -145,6 +160,7 @@ export function SlotClient({
 
       setActionError(null);
       setCooldownUntil(Date.now() + 60_000);
+      setCanViewParticipants(true);
       router.refresh();
     });
   }
@@ -183,40 +199,49 @@ export function SlotClient({
       </div>
 
       <div className="rounded-xl border bg-card p-4 shadow-sm">
-        <h2 className="text-lg font-medium">{strings.checkIn}</h2>
+        <h2 className="text-lg font-medium">{checkInTitle}</h2>
 
         {!currentUserId ? (
-          <p className="mt-2 text-sm text-muted-foreground">{strings.loginToCheckIn}</p>
-        ) : null}
+          <div className="mt-2 space-y-3">
+            <p className="text-sm text-muted-foreground">{strings.loginToCheckIn}</p>
+            <Button asChild size="sm">
+              <Link href={signInUrl}>Sign in</Link>
+            </Button>
+          </div>
+        ) : (
+          <>
+            {cooldownSeconds > 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {strings.recentCooldown} ({cooldownSeconds}s)
+              </p>
+            ) : null}
 
-        {cooldownSeconds > 0 ? (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {strings.recentCooldown} ({cooldownSeconds}s)
-          </p>
-        ) : null}
+            {actionError ? <p className="mt-2 text-sm text-destructive">{actionError}</p> : null}
 
-        {actionError ? <p className="mt-2 text-sm text-destructive">{actionError}</p> : null}
-
-        <div className="mt-4 grid grid-cols-6 gap-2 sm:grid-cols-8">
-          {["😂", "❤️", "🤣", "👍", "😭", "🙏", "😘", "🥰", "😍", "😊", "💔", "🔥", "😎", "💩", "💪", "🙌", "👏", "✅", "👀", "💀", "🎉", "🎶", "🤡"].map((emoji) => (
-            <button
-              key={emoji}
-              type="button"
-              onClick={() => onCheckIn(emoji)}
-              disabled={!canCheckIn}
-              className="rounded-lg border bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label={`Check in with ${emoji}`}
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
+            <div className="mt-4 grid grid-cols-6 gap-2 sm:grid-cols-8">
+              {["😂", "❤️", "🤣", "👍", "😭", "🙏", "😘", "🥰", "😍", "😊", "💔", "🔥", "😎", "💩", "💪", "🙌", "👏", "✅", "👀", "💀", "🎉", "🎶", "🤡"].map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => onCheckIn(emoji)}
+                  disabled={!canCheckIn}
+                  className="rounded-lg border bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={`Check in with ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border bg-card p-4 shadow-sm">
         <h2 className="text-lg font-medium">{strings.checkins}</h2>
 
-        {checkIns.length === 0 ? (
+        {!currentUserId ? null : !canViewParticipants ? (
+          <p className="mt-2 text-sm text-muted-foreground">{strings.joinToSeeParticipants}</p>
+        ) : checkIns.length === 0 ? (
           <p className="mt-2 text-sm text-muted-foreground">{strings.emptyCheckins}</p>
         ) : (
           <ul className="mt-3 space-y-2">

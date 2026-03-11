@@ -133,7 +133,7 @@ begin
   limit 1;
 
   if last_check_in_at is not null and current_ts < last_check_in_at + interval '60 seconds' then
-    raise exception 'Cooldown active. Please wait before checking in again.';
+    raise exception 'One emoji per minute is available';
   end if;
 
   return new;

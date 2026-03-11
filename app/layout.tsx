@@ -53,7 +53,7 @@ export default async function RootLayout({
                 </Button>
                 {user ? (
                   <Button asChild variant="ghost" size="sm">
-                    <Link href="/slot/new">{strings.nav.createSlot}</Link>
+                    <Link href="/linket/new">{strings.nav.createSlot}</Link>
                   </Button>
                 ) : null}
               </nav>

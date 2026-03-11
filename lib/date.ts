@@ -42,7 +42,7 @@ export function validateSlotDuration(startAtIso: string, endAtIso: string): void
   const maxDurationMs = SLOT_MAX_HOURS * 60 * 60 * 1000;
 
   if (durationMs < minDurationMs || durationMs > maxDurationMs) {
-    throw new Error(`Slot duration must be between ${SLOT_MIN_HOURS} and ${SLOT_MAX_HOURS} hours`);
+    throw new Error(`Linket duration must be between ${SLOT_MIN_HOURS} and ${SLOT_MAX_HOURS} hours`);
   }
 }
 

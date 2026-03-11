@@ -53,5 +53,5 @@ Linketus is a minimalist social presence PWA built with Next.js + Supabase.
 ## Notes
 
 - Timestamps are stored in UTC and displayed in user local timezone.
-- Participated slots query uses SQL `DISTINCT slot_id` via `get_participated_slots` function.
-- Deleting a slot cascades to slot check-ins.
+- Participated linkets query uses SQL `DISTINCT slot_id` via `get_participated_slots` function.
+- Deleting a linket cascades to related check-ins.

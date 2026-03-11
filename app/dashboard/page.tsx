@@ -37,15 +37,12 @@ export default async function DashboardPage() {
   return (
     <section className="space-y-6">
       <h1 className="text-3xl font-semibold tracking-tight">{strings.dashboard.title}</h1>
-      <div className="space-y-2">
-        <h2 className="text-sm font-medium text-muted-foreground">{strings.dashboard.feed}</h2>
-        <DashboardFeed
-          items={feed}
-          locale={locale}
-          dashboardStrings={strings.dashboard}
-          slotStrings={strings.slot}
-        />
-      </div>
+      <DashboardFeed
+        items={feed}
+        locale={locale}
+        dashboardStrings={strings.dashboard}
+        slotStrings={strings.slot}
+      />
     </section>
   );
 }

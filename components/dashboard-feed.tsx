@@ -12,6 +12,12 @@ type DashboardFeedProps = {
   slotStrings: Dictionary[Locale]["slot"];
 };
 
+const dotStyles: Record<"waiting" | "active" | "archive", string> = {
+  waiting: "bg-orange-400",
+  active: "bg-emerald-500",
+  archive: "bg-slate-400",
+};
+
 export function DashboardFeed({ items, locale, dashboardStrings, slotStrings }: DashboardFeedProps) {
   if (items.length === 0) {
     return <p className="text-sm text-muted-foreground">{dashboardStrings.emptyFeed}</p>;
@@ -25,19 +31,16 @@ export function DashboardFeed({ items, locale, dashboardStrings, slotStrings }: 
         return (
           <li key={slot.id} className="border-b px-1 py-3 last:border-b-0 sm:px-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Link href={`/slot/${slot.id}`} className="font-medium hover:underline">
+              <span
+                aria-hidden
+                className={`inline-block size-2 rounded-full ${dotStyles[state]}`}
+              />
+              <Link href={`/linket/${slot.id}`} className="font-medium hover:underline">
                 {slot.title}
               </Link>
-              {slot.isMine ? (
-                <span className="inline-flex items-center rounded-sm bg-emerald-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  {dashboardStrings.mineMark}
-                </span>
-              ) : null}
             </div>
 
-            <p className="mt-1 text-xs text-muted-foreground">
-              {slotStrings[state]} · <LocalDateTime iso={slot.created_at} locale={locale} />
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{slotStrings[state]}</p>
 
             <p className="mt-1 text-xs text-muted-foreground">
               <LocalDateTime iso={slot.start_at} locale={locale} /> -{" "}

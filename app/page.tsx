@@ -1,54 +1,26 @@
 import Link from "next/link";
 
-import { signInWithGoogle } from "@/app/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getDictionary } from "@/lib/i18n/shared";
-import { getServerLocale } from "@/lib/i18n/server";
-import { createClient } from "@/lib/supabase/server";
+import { InstallLinketusCta } from "@/components/install-linketus-cta";
 
-export default async function HomePage() {
-  const locale = await getServerLocale();
-  const strings = getDictionary(locale);
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+export default function HomePage() {
   return (
-    <section className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-semibold tracking-tight">{strings.home.title}</h1>
-        <p className="max-w-xl text-base text-muted-foreground">{strings.home.description}</p>
-        <div className="flex flex-wrap gap-3">
-          {user ? (
-            <>
-              <Button asChild>
-                <Link href="/dashboard">{strings.home.openDashboard}</Link>
-              </Button>
-              <Button asChild variant="outline">
-                <Link href="/slot/new">{strings.home.createSlot}</Link>
-              </Button>
-            </>
-          ) : (
-            <form action={signInWithGoogle}>
-              <Button type="submit">{strings.home.signIn}</Button>
-            </form>
-          )}
-        </div>
+    <section className="mx-auto flex max-w-4xl flex-col items-center justify-center py-16 text-center">
+      <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+        Presence over communication
+      </h1>
+
+      <div className="mt-8 space-y-2 text-lg leading-relaxed text-foreground/90 sm:text-xl">
+        <p>Linketus is a simple way to be present with others - even when you&apos;re apart.</p>
+        <p>Create a linket, invite people, and check in with a single tap.</p>
+        <p>No chat. No noise. Just presence.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{strings.appName}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>- Shared slot: 1 to 720 hours.</p>
-          <p>- One-tap check-ins with emoji.</p>
-          <p>- Live activity stream + PWA install.</p>
-        </CardContent>
-      </Card>
+      <Button asChild size="lg" className="mt-10 h-12 px-8 text-base font-semibold">
+        <Link href="/linket/new">Create your first linket</Link>
+      </Button>
+
+      <InstallLinketusCta />
     </section>
   );
 }

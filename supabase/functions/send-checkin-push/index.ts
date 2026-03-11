@@ -68,7 +68,7 @@ Deno.serve(async (request) => {
     .single();
 
   if (slotError || !slot) {
-    return new Response(JSON.stringify({ error: slotError?.message ?? "Slot not found" }), {
+    return new Response(JSON.stringify({ error: slotError?.message ?? "Linket not found" }), {
       status: 404,
       headers: {
         ...corsHeaders,
@@ -138,7 +138,7 @@ Deno.serve(async (request) => {
   const notificationBody = JSON.stringify({
     title: "Linketus",
     body: `${actorName} checked in ${payload.emoji} in \"${slot.title}\"`,
-    url: `/slot/${slot.id}`,
+    url: `/linket/${slot.id}`,
   });
 
   const results = await Promise.allSettled(
