@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Presence over communication / Присутствие важнее общения",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon-192.png",
+    icon: "/favicon.svg",
     apple: "/apple-touch-icon.png",
   },
 };
@@ -41,8 +41,11 @@ export default async function RootLayout({
         <header className="px-3 pt-3 sm:px-4">
           <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 rounded-3xl border border-border/80 bg-card/85 px-4 py-3 shadow-[0_8px_24px_-18px_rgba(32,29,26,0.4)] backdrop-blur">
             <div className="flex items-center gap-3">
-              <Link href="/" className="text-lg font-semibold tracking-tight">
-                {strings.appName}
+              <Link href="/" className="flex items-center gap-1.5 text-lg font-semibold tracking-tight">
+                <span aria-hidden className="text-emerald-600">
+                  └●
+                </span>
+                <span>{strings.appName}</span>
               </Link>
               <nav className="flex items-center gap-2">
                 <Button asChild variant="ghost" size="sm">
