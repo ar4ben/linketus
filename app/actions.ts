@@ -38,7 +38,12 @@ async function getActionStrings() {
   return getDictionary(locale);
 }
 
-async function sendPushAfterCheckIn(payload: { slotId: string; actorId: string; emoji: string }) {
+async function sendPushAfterCheckIn(payload: {
+  slotId: string;
+  actorId: string;
+  emoji: string;
+  accessToken?: string | null;
+}) {
   if (!isPushConfigured) {
     return;
   }
@@ -47,12 +52,15 @@ async function sendPushAfterCheckIn(payload: { slotId: string; actorId: string; 
     .replace(/\/$/, "")
     .replace(/\/send-checkin-push$/, "");
   const endpoint = `${edgeBaseUrl}/send-checkin-push`;
+  const anonKey = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  const authorizationToken = payload.accessToken?.trim() || requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${requireEnv("SUPABASE_SERVICE_ROLE_KEY")}`,
+      apikey: anonKey,
+      Authorization: `Bearer ${authorizationToken}`,
     },
     body: JSON.stringify({
       slot_id: payload.slotId,
@@ -240,10 +248,15 @@ export async function checkInAction(
   revalidatePath(`/linket/${slotId}`);
   revalidatePath("/dashboard");
 
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   await sendPushAfterCheckIn({
     slotId,
     actorId: user.id,
     emoji,
+    accessToken: session?.access_token ?? null,
   });
 
   return defaultActionState;
