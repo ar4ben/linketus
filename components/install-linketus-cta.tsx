@@ -8,6 +8,12 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+type InstallLinketusCtaProps = {
+  ctaText: string;
+  iosTitle: string;
+  iosBody: string;
+};
+
 function isIosDevice() {
   if (typeof navigator === "undefined") {
     return false;
@@ -25,7 +31,7 @@ function isStandaloneMode() {
   return Boolean(iosStandalone) || window.matchMedia("(display-mode: standalone)").matches;
 }
 
-export function InstallLinketusCta() {
+export function InstallLinketusCta({ ctaText, iosTitle, iosBody }: InstallLinketusCtaProps) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIosPopover, setShowIosPopover] = useState(false);
   const [isInstalled, setIsInstalled] = useState(() => isStandaloneMode());
@@ -80,15 +86,13 @@ export function InstallLinketusCta() {
         className="flex items-center gap-3 rounded-2xl border border-input bg-card px-5 py-3 text-center text-base font-semibold text-foreground shadow-[0_10px_24px_-20px_rgba(32,29,26,0.6)] transition hover:bg-muted/50"
       >
         <SquarePlus className="size-9 text-emerald-600" />
-        <span>Add Linketus to your home screen for the best experience</span>
+        <span>{ctaText}</span>
       </button>
 
       {isIos && showIosPopover ? (
         <div className="absolute top-full z-10 mt-3 w-[min(92vw,420px)] rounded-2xl border border-border/90 bg-popover p-4 text-left text-sm text-popover-foreground shadow-lg">
-          <p className="font-medium">Install on iPhone/iPad</p>
-          <p className="mt-1 text-muted-foreground">
-            Tap the Share button in Safari, then choose &quot;Add to Home Screen&quot;.
-          </p>
+          <p className="font-medium">{iosTitle}</p>
+          <p className="mt-1 text-muted-foreground">{iosBody}</p>
         </div>
       ) : null}
     </div>

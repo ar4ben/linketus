@@ -116,7 +116,7 @@ Deno.serve(async (request) => {
     .eq("id", payload.actor_id)
     .maybeSingle();
 
-  const actorName = actor?.full_name ?? "Someone";
+  const actorName = actor?.full_name ?? "Кто-то / Someone";
 
   const { data: subscriptions, error: subscriptionsError } = await supabase
     .from("push_subscriptions")
@@ -137,7 +137,7 @@ Deno.serve(async (request) => {
 
   const notificationBody = JSON.stringify({
     title: "Linketus",
-    body: `${actorName} checked in ${payload.emoji} in \"${slot.title}\"`,
+    body: `${actorName} отметился ${payload.emoji} в linket \"${slot.title}\" / ${actorName} checked in ${payload.emoji} in \"${slot.title}\"`,
     url: `/linket/${slot.id}`,
   });
 

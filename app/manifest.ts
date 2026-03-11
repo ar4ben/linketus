@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Linketus",
     short_name: "Linketus",
-    description: "Presence over communication",
+    description: "Presence over communication / Присутствие важнее общения",
     start_url: "/",
     display: "standalone",
     background_color: "#f8fafc",

@@ -132,7 +132,7 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
             step={1}
             value={durationHours}
             onChange={(event) => setDurationHours(event.target.value)}
-            placeholder="Duration (in hours)"
+            placeholder={strings.durationLabel}
             className="h-9 px-2 py-0"
             aria-invalid={durationTooLarge}
             required

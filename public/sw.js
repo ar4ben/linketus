@@ -35,7 +35,7 @@ self.addEventListener("push", (event) => {
   const payload = event.data ? event.data.json() : {};
   const title = payload.title || "Linketus";
   const options = {
-    body: payload.body || "New check-in",
+    body: payload.body || "Новая активность в linket / New linket activity",
     icon: "/icon-192.png",
     badge: "/icon-192.png",
     data: {

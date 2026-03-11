@@ -20,6 +20,7 @@ type SlotClientProps = {
   currentUserId: string | null;
   hasJoined: boolean;
   signInUrl: string;
+  signInLabel: string;
   locale: Locale;
   strings: Dictionary[Locale]["slot"];
 };
@@ -44,6 +45,7 @@ export function SlotClient({
   currentUserId,
   hasJoined,
   signInUrl,
+  signInLabel,
   locale,
   strings,
 }: SlotClientProps) {
@@ -132,8 +134,8 @@ export function SlotClient({
           });
 
           if (incoming.user_id !== currentUserId) {
-            const actor = profile?.full_name ?? "Someone";
-            toast.info(`${actor} checked in ${incoming.emoji}`);
+            const actor = profile?.full_name ?? strings.someone;
+            toast.info(`${actor} ${strings.toastCheckedIn} ${incoming.emoji}`);
           }
         },
       )
@@ -142,7 +144,7 @@ export function SlotClient({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [supabase, slot.id, currentUserId, canViewParticipants]);
+  }, [supabase, slot.id, currentUserId, canViewParticipants, strings.someone, strings.toastCheckedIn]);
 
   async function onCheckIn(emoji: string) {
     startTransition(async () => {
@@ -205,7 +207,7 @@ export function SlotClient({
           <div className="mt-2 space-y-3">
             <p className="text-sm text-muted-foreground">{strings.loginToCheckIn}</p>
             <Button asChild size="sm">
-              <Link href={signInUrl}>Sign in</Link>
+              <Link href={signInUrl}>{signInLabel}</Link>
             </Button>
           </div>
         ) : (
@@ -226,7 +228,7 @@ export function SlotClient({
                   onClick={() => onCheckIn(emoji)}
                   disabled={!canCheckIn}
                   className="rounded-2xl border border-border/80 bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label={`Check in with ${emoji}`}
+                  aria-label={`${strings.emojiAriaPrefix} ${emoji}`}
                 >
                   {emoji}
                 </button>

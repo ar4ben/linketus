@@ -74,6 +74,7 @@ export default async function SlotPage({ params }: SlotPageProps) {
         currentUserId={user?.id ?? null}
         hasJoined={hasJoined}
         signInUrl={signInUrl}
+        signInLabel={strings.nav.signIn}
         locale={locale}
         strings={strings.slot}
       />

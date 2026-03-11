@@ -7,6 +7,8 @@ import { redirect } from "next/navigation";
 import { ALLOWED_EMOJIS, SLOT_MAX_HOURS, SLOT_MIN_HOURS } from "@/lib/constants";
 import { localDateTimeToUtcIso, validateSlotDuration } from "@/lib/date";
 import { env, isPushConfigured, requireEnv } from "@/lib/env";
+import { getDictionary } from "@/lib/i18n/shared";
+import { getServerLocale } from "@/lib/i18n/server";
 import { createClient } from "@/lib/supabase/server";
 
 type ActionState = {
@@ -29,6 +31,11 @@ function getBaseUrlFromHeaders(headerStore: Awaited<ReturnType<typeof headers>>)
   }
 
   return env.siteUrl;
+}
+
+async function getActionStrings() {
+  const locale = await getServerLocale();
+  return getDictionary(locale);
 }
 
 async function sendPushAfterCheckIn(payload: { slotId: string; actorId: string; emoji: string }) {
@@ -94,13 +101,14 @@ export async function createSlotAction(
   _prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const strings = await getActionStrings();
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Authentication required" };
+    return { error: strings.createSlot.errorAuthRequired };
   }
 
   const title = String(formData.get("title") ?? "").trim();
@@ -111,19 +119,19 @@ export async function createSlotAction(
   const durationHours = Number(durationRaw);
 
   if (!title || !dateLocal || !timeLocal || !durationRaw) {
-    return { error: "Please fill all required fields" };
+    return { error: strings.createSlot.errorRequiredFields };
   }
 
   if (!Number.isFinite(durationHours)) {
-    return { error: "Duration must be a number" };
+    return { error: strings.createSlot.errorDurationNumber };
   }
 
   if (durationHours > SLOT_MAX_HOURS) {
-    return { error: `${SLOT_MAX_HOURS} maximum` };
+    return { error: strings.createSlot.durationMaxError };
   }
 
   if (durationHours < SLOT_MIN_HOURS) {
-    return { error: `Duration must be at least ${SLOT_MIN_HOURS} hour` };
+    return { error: strings.createSlot.errorDurationMin };
   }
 
   let startAtIso: string;
@@ -134,8 +142,8 @@ export async function createSlotAction(
     startAtIso = localDateTimeToUtcIso(startLocal, offset);
     endAtIso = new Date(new Date(startAtIso).getTime() + durationHours * 60 * 60 * 1000).toISOString();
     validateSlotDuration(startAtIso, endAtIso);
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : "Invalid time range" };
+  } catch {
+    return { error: strings.createSlot.errorInvalidTimeRange };
   }
 
   const { data, error } = await supabase
@@ -150,20 +158,21 @@ export async function createSlotAction(
     .single();
 
   if (error) {
-    return { error: error.message };
+    return { error: strings.createSlot.errorCreateFailed };
   }
 
   redirect(`/linket/${data.id}`);
 }
 
 export async function deleteSlotAction(slotId: string) {
+  const strings = await getActionStrings();
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    throw new Error("Authentication required");
+    throw new Error(strings.slot.errorAuthRequired);
   }
 
   const { error } = await supabase
@@ -173,7 +182,7 @@ export async function deleteSlotAction(slotId: string) {
     .eq("creator_id", user.id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(strings.slot.errorDeleteFailed);
   }
 
   revalidatePath("/dashboard");
@@ -184,24 +193,25 @@ export async function checkInAction(
   _prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const strings = await getActionStrings();
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Authentication required" };
+    return { error: strings.slot.errorAuthRequired };
   }
 
   const slotId = String(formData.get("slot_id") ?? "");
   const emoji = String(formData.get("emoji") ?? "");
 
   if (!slotId || !emoji) {
-    return { error: "Linket and emoji are required" };
+    return { error: strings.slot.errorLinketEmojiRequired };
   }
 
   if (!ALLOWED_EMOJIS.includes(emoji as (typeof ALLOWED_EMOJIS)[number])) {
-    return { error: "Unsupported emoji" };
+    return { error: strings.slot.errorUnsupportedEmoji };
   }
 
   const { error } = await supabase.from("check_ins").insert({
@@ -211,11 +221,17 @@ export async function checkInAction(
   });
 
   if (error) {
-    if (error.message.includes("Cooldown active")) {
-      return { error: "One emoji per minute is available" };
+    const errorMessage = error.message.toLowerCase();
+
+    if (errorMessage.includes("cooldown active")) {
+      return { error: strings.slot.recentCooldown };
     }
 
-    return { error: error.message };
+    if (errorMessage.includes("only while the linket is active")) {
+      return { error: strings.slot.errorActiveWindow };
+    }
+
+    return { error: strings.slot.errorCheckInFailed };
   }
 
   revalidatePath(`/linket/${slotId}`);

@@ -14,7 +14,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Linketus",
-  description: "Presence over communication",
+  description: "Presence over communication / Присутствие важнее общения",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon-192.png",
