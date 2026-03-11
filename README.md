@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Linketus
 
-## Getting Started
+Linketus is a minimalist social presence PWA built with Next.js + Supabase.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js (App Router)
+- Tailwind CSS + shadcn/ui
+- Supabase (Auth, Postgres, Realtime, RLS)
+- Sonner (in-app toasts)
+- Web Push via Supabase Edge Function
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
+   - `npm install`
+2. Create env file:
+   - `cp .env.example .env.local`
+3. Fill required values in `.env.local`.
+4. Start dev server:
+   - `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Supabase setup
 
-## Learn More
+1. Open your Supabase SQL editor.
+2. Run migration SQL from:
+   - `supabase/migrations/202603110001_init.sql`
+3. In Supabase Auth, enable Google provider.
+4. Set callback URL:
+   - `http://localhost:3000/auth/callback`
 
-To learn more about Next.js, take a look at the following resources:
+## Push notifications
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Generate VAPID keys.
+2. Deploy edge function:
+   - `supabase functions deploy send-checkin-push`
+3. Set edge function secrets:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `VAPID_PUBLIC_KEY`
+   - `VAPID_PRIVATE_KEY`
+   - `VAPID_SUBJECT`
+4. Set app env vars:
+   - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+   - `SUPABASE_EDGE_FUNCTION_URL` (for example `https://<project-ref>.functions.supabase.co`)
+   - `SUPABASE_SERVICE_ROLE_KEY`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Checks
 
-## Deploy on Vercel
+- Lint: `npm run lint`
+- Production build: `npm run build`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Timestamps are stored in UTC and displayed in user local timezone.
+- Participated slots query uses SQL `DISTINCT slot_id` via `get_participated_slots` function.
+- Deleting a slot cascades to slot check-ins.
