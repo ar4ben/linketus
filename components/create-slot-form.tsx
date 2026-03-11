@@ -6,7 +6,6 @@ import { useActionState, useRef, useState, type FormEvent } from "react";
 import { createSlotAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { SLOT_MAX_HOURS } from "@/lib/constants";
 import type { Dictionary, Locale } from "@/lib/i18n/shared";
 
@@ -21,7 +20,7 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
   const timeInputRef = useRef<HTMLInputElement>(null);
   const [dateValue, setDateValue] = useState("");
   const [timeValue, setTimeValue] = useState("");
-  const [durationHours, setDurationHours] = useState("1");
+  const [durationHours, setDurationHours] = useState("");
   const [state, formAction, isPending] = useActionState(createSlotAction, { error: null });
 
   const durationTooLarge = Number(durationHours) > SLOT_MAX_HOURS;
@@ -66,13 +65,16 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
       />
 
       <div className="space-y-2">
-        <Label htmlFor="title">{strings.titleLabel}</Label>
-        <Input id="title" name="title" placeholder={strings.titlePlaceholder} maxLength={120} required />
-      </div>
+        <Input
+          id="title"
+          name="title"
+          placeholder={strings.titleLabel}
+          maxLength={120}
+          className="h-9 px-2 py-0"
+          required
+        />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor="date_local">{strings.dateLabel}</Label>
+        <div className="grid gap-2 sm:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_minmax(220px,1fr)]">
           <div className="relative">
             <button
               type="button"
@@ -80,7 +82,9 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               className="flex h-9 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2 text-sm outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
             >
               <CalendarDays className="size-4 text-muted-foreground" />
-              {dateValue ? <span className="text-sm">{dateValue}</span> : null}
+              <span className={dateValue ? "text-foreground" : "text-muted-foreground"}>
+                {dateValue || strings.dateLabel}
+              </span>
             </button>
             <input
               ref={dateInputRef}
@@ -94,10 +98,7 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               required
             />
           </div>
-        </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="time_local">{strings.timeLabel}</Label>
           <div className="relative">
             <button
               type="button"
@@ -105,7 +106,9 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               className="flex h-9 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2 text-sm outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Clock3 className="size-4 text-muted-foreground" />
-              {timeValue ? <span className="text-sm">{timeValue}</span> : null}
+              <span className={timeValue ? "text-foreground" : "text-muted-foreground"}>
+                {timeValue || strings.timeLabel}
+              </span>
             </button>
             <input
               ref={timeInputRef}
@@ -120,24 +123,27 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               required
             />
           </div>
+
+          <Input
+            id="duration_hours"
+            name="duration_hours"
+            type="number"
+            min={1}
+            step={1}
+            value={durationHours}
+            onChange={(event) => setDurationHours(event.target.value)}
+            placeholder="Duration (in hours)"
+            className="h-9 px-2 py-0"
+            aria-invalid={durationTooLarge}
+            required
+          />
         </div>
       </div>
 
-      <div className="space-y-1">
-        <Label htmlFor="duration_hours">{strings.durationLabel}</Label>
-        <Input
-          id="duration_hours"
-          name="duration_hours"
-          type="number"
-          min={1}
-          step={1}
-          value={durationHours}
-          onChange={(event) => setDurationHours(event.target.value)}
-          className="h-9 px-2 py-0"
-          aria-invalid={durationTooLarge}
-          required
-        />
-        {durationTooLarge ? <p className="text-sm text-destructive">{strings.durationMaxError}</p> : null}
+      <div className="min-h-5">
+        {durationTooLarge ? (
+          <p className="text-sm text-destructive">{strings.durationMaxError}</p>
+        ) : null}
       </div>
 
       {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
