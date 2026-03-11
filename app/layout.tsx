@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description: "Presence over communication / Присутствие важнее общения",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.svg",
-    apple: "/apple-touch-icon-v2.png",
+    icon: "/favicon-v6.png",
+    apple: "/apple-touch-icon-v6.png",
   },
 };
 
