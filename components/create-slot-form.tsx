@@ -25,22 +25,14 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
 
   const durationTooLarge = Number(durationHours) > SLOT_MAX_HOURS;
 
-  function openNativePicker(input: HTMLInputElement | null) {
-    if (!input) {
-      return;
-    }
-
+  function onPickerInputClick(input: HTMLInputElement) {
     if ("showPicker" in input) {
       try {
         (input as HTMLInputElement & { showPicker?: () => void }).showPicker?.();
-        return;
       } catch {
-        // Some browsers may block picker calls outside trusted gestures.
+        // Some browsers ignore programmatic picker calls.
       }
     }
-
-    input.focus();
-    input.click();
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -75,17 +67,13 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
         />
 
         <div className="grid gap-2 sm:grid-cols-[minmax(180px,1fr)_minmax(180px,1fr)_minmax(220px,1fr)]">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => openNativePicker(dateInputRef.current)}
-              className="flex h-9 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2 text-sm outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
-            >
+          <div className="relative h-9 rounded-lg border border-input bg-transparent">
+            <div className="pointer-events-none flex h-full items-center gap-2 px-2 text-sm">
               <CalendarDays className="size-4 text-muted-foreground" />
               <span className={dateValue ? "text-foreground" : "text-muted-foreground"}>
                 {dateValue || strings.dateLabel}
               </span>
-            </button>
+            </div>
             <input
               ref={dateInputRef}
               id="date_local"
@@ -93,23 +81,24 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               type="date"
               value={dateValue}
               onChange={(event) => setDateValue(event.target.value)}
-              onKeyDown={(event) => event.preventDefault()}
-              className="sr-only"
+              onClick={() => {
+                if (dateInputRef.current) {
+                  onPickerInputClick(dateInputRef.current);
+                }
+              }}
+              className="absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none bg-transparent text-transparent opacity-[0.01]"
+              aria-label={strings.dateLabel}
               required
             />
           </div>
 
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => openNativePicker(timeInputRef.current)}
-              className="flex h-9 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2 text-sm outline-none transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring"
-            >
+          <div className="relative h-9 rounded-lg border border-input bg-transparent">
+            <div className="pointer-events-none flex h-full items-center gap-2 px-2 text-sm">
               <Clock3 className="size-4 text-muted-foreground" />
               <span className={timeValue ? "text-foreground" : "text-muted-foreground"}>
                 {timeValue || strings.timeLabel}
               </span>
-            </button>
+            </div>
             <input
               ref={timeInputRef}
               id="time_local"
@@ -117,8 +106,13 @@ export function CreateSlotForm({ locale, strings }: CreateSlotFormProps) {
               type="time"
               value={timeValue}
               onChange={(event) => setTimeValue(event.target.value)}
-              onKeyDown={(event) => event.preventDefault()}
-              className="sr-only"
+              onClick={() => {
+                if (timeInputRef.current) {
+                  onPickerInputClick(timeInputRef.current);
+                }
+              }}
+              className="absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none bg-transparent text-transparent opacity-[0.01]"
+              aria-label={strings.timeLabel}
               step={60}
               required
             />
