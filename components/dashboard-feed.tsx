@@ -20,29 +20,36 @@ const dotStyles: Record<"waiting" | "active" | "archive", string> = {
 
 export function DashboardFeed({ items, locale, dashboardStrings, slotStrings }: DashboardFeedProps) {
   if (items.length === 0) {
-    return <p className="text-sm text-muted-foreground">{dashboardStrings.emptyFeed}</p>;
+    return (
+      <div className="rounded-3xl border border-border/80 bg-card px-4 py-6 text-sm text-muted-foreground shadow-[0_10px_24px_-20px_rgba(32,29,26,0.45)]">
+        {dashboardStrings.emptyFeed}
+      </div>
+    );
   }
 
   return (
-    <ul className="border-y bg-background">
+    <ul className="space-y-3">
       {items.map((slot) => {
         const state = getSlotState(slot.start_at, slot.end_at);
 
         return (
-          <li key={slot.id} className="border-b px-1 py-3 last:border-b-0 sm:px-2">
-            <div className="flex flex-wrap items-center gap-2">
+          <li
+            key={slot.id}
+            className="rounded-3xl border border-border/80 bg-card px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.5)] transition hover:shadow-[0_14px_28px_-22px_rgba(32,29,26,0.55)]"
+          >
+            <div className="flex flex-wrap items-center gap-2.5">
               <span
                 aria-hidden
-                className={`inline-block size-2 rounded-full ${dotStyles[state]}`}
+                className={`inline-block size-2.5 rounded-full ${dotStyles[state]}`}
               />
-              <Link href={`/linket/${slot.id}`} className="font-medium hover:underline">
+              <Link href={`/linket/${slot.id}`} className="text-base font-semibold hover:underline">
                 {slot.title}
               </Link>
             </div>
 
-            <p className="mt-1 text-xs text-muted-foreground">{slotStrings[state]}</p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">{slotStrings[state]}</p>
 
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-2 rounded-2xl bg-muted/65 px-2.5 py-1 text-xs text-muted-foreground">
               <LocalDateTime iso={slot.start_at} locale={locale} /> -{" "}
               <LocalDateTime iso={slot.end_at} locale={locale} />
             </p>

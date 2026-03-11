@@ -11,7 +11,10 @@ export default function HomePage() {
       </h1>
 
       <div className="mt-8 space-y-2 text-lg leading-relaxed text-foreground/90 sm:text-xl">
-        <p>Linketus is a simple way to be present with others - even when you&apos;re apart.</p>
+        <p>
+          <strong className="font-bold">Linketus</strong> is a simple way to be present with others
+          - even when you&apos;re apart.
+        </p>
         <p>Create a linket, invite people, and check in with a single tap.</p>
         <p>No chat. No noise. Just presence.</p>
       </div>

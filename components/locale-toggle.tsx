@@ -23,7 +23,7 @@ export function LocaleToggle({ locale, label }: LocaleToggleProps) {
       <select
         value={locale}
         onChange={(event) => onLocaleChange(event.target.value as Locale)}
-        className="rounded-md border bg-background px-2 py-1"
+        className="rounded-xl border border-input bg-card px-2.5 py-1.5 text-sm"
       >
         <option value="en">EN</option>
         <option value="ru">RU</option>

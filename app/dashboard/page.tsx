@@ -35,8 +35,8 @@ export default async function DashboardPage() {
   const { feed } = await getDashboardSlots(user.id);
 
   return (
-    <section className="space-y-6">
-      <h1 className="text-3xl font-semibold tracking-tight">{strings.dashboard.title}</h1>
+    <section className="space-y-5">
+      <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{strings.dashboard.title}</h1>
       <DashboardFeed
         items={feed}
         locale={locale}

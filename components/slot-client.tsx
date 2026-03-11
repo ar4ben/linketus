@@ -172,7 +172,7 @@ export function SlotClient({
 
   return (
     <section className="space-y-6">
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <div className="rounded-3xl border border-border/80 bg-card p-4 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.45)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Badge className={stateStyles[state]}>{strings[state]}</Badge>
           <Button type="button" variant="outline" size="sm" onClick={onCopyLink}>
@@ -198,7 +198,7 @@ export function SlotClient({
         ) : null}
       </div>
 
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <div className="rounded-3xl border border-border/80 bg-card p-4 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.45)]">
         <h2 className="text-lg font-medium">{checkInTitle}</h2>
 
         {!currentUserId ? (
@@ -225,7 +225,7 @@ export function SlotClient({
                   type="button"
                   onClick={() => onCheckIn(emoji)}
                   disabled={!canCheckIn}
-                  className="rounded-lg border bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-2xl border border-border/80 bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`Check in with ${emoji}`}
                 >
                   {emoji}
@@ -236,7 +236,7 @@ export function SlotClient({
         )}
       </div>
 
-      <div className="rounded-xl border bg-card p-4 shadow-sm">
+      <div className="rounded-3xl border border-border/80 bg-card p-4 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.45)]">
         <h2 className="text-lg font-medium">{strings.checkins}</h2>
 
         {!currentUserId ? null : !canViewParticipants ? (
@@ -246,7 +246,10 @@ export function SlotClient({
         ) : (
           <ul className="mt-3 space-y-2">
             {checkIns.map((checkIn) => (
-              <li key={checkIn.id} className="flex items-center justify-between rounded-md border p-2">
+              <li
+                key={checkIn.id}
+                className="flex items-center justify-between rounded-2xl border border-border/80 bg-background p-2.5"
+              >
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{checkIn.emoji}</span>
                   <span className="text-sm">

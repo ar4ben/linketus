@@ -37,12 +37,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <body
-        suppressHydrationWarning
-        className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-50 antialiased"
-      >
-        <header className="border-b bg-white/70 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+      <body suppressHydrationWarning className="min-h-screen antialiased">
+        <header className="px-3 pt-3 sm:px-4">
+          <div className="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 rounded-3xl border border-border/80 bg-card/85 px-4 py-3 shadow-[0_8px_24px_-18px_rgba(32,29,26,0.4)] backdrop-blur">
             <div className="flex items-center gap-3">
               <Link href="/" className="text-lg font-semibold tracking-tight">
                 {strings.appName}
@@ -79,7 +76,7 @@ export default async function RootLayout({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-10">{children}</main>
         <Toaster richColors position="top-right" />
         <PushSubscriptionManager enabled={Boolean(user)} vapidPublicKey={env.pushPublicKey} />
       </body>

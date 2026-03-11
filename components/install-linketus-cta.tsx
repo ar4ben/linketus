@@ -77,14 +77,14 @@ export function InstallLinketusCta() {
       <button
         type="button"
         onClick={onInstallClick}
-        className="flex items-center gap-3 rounded-xl border border-input bg-background px-5 py-3 text-center text-base font-medium text-foreground shadow-sm transition hover:bg-muted/40"
+        className="flex items-center gap-3 rounded-2xl border border-input bg-card px-5 py-3 text-center text-base font-semibold text-foreground shadow-[0_10px_24px_-20px_rgba(32,29,26,0.6)] transition hover:bg-muted/50"
       >
-        <SquarePlus className="size-8 text-emerald-600" />
+        <SquarePlus className="size-9 text-emerald-600" />
         <span>Add Linketus to your home screen for the best experience</span>
       </button>
 
       {isIos && showIosPopover ? (
-        <div className="absolute top-full z-10 mt-3 w-[min(92vw,420px)] rounded-xl border bg-popover p-4 text-left text-sm text-popover-foreground shadow-lg">
+        <div className="absolute top-full z-10 mt-3 w-[min(92vw,420px)] rounded-2xl border border-border/90 bg-popover p-4 text-left text-sm text-popover-foreground shadow-lg">
           <p className="font-medium">Install on iPhone/iPad</p>
           <p className="mt-1 text-muted-foreground">
             Tap the Share button in Safari, then choose &quot;Add to Home Screen&quot;.
