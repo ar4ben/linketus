@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { ALLOWED_EMOJIS } from "@/lib/constants";
+import { ALLOWED_EMOJIS, SLOT_MAX_HOURS, SLOT_MIN_HOURS } from "@/lib/constants";
 import { localDateTimeToUtcIso, validateSlotDuration } from "@/lib/date";
 import { env, isPushConfigured, requireEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
@@ -104,20 +104,35 @@ export async function createSlotAction(
   }
 
   const title = String(formData.get("title") ?? "").trim();
-  const startLocal = String(formData.get("start_local") ?? "");
-  const endLocal = String(formData.get("end_local") ?? "");
+  const dateLocal = String(formData.get("date_local") ?? "");
+  const timeLocal = String(formData.get("time_local") ?? "");
+  const durationRaw = String(formData.get("duration_hours") ?? "");
   const offset = Number(formData.get("timezone_offset_minutes") ?? "0");
+  const durationHours = Number(durationRaw);
 
-  if (!title || !startLocal || !endLocal) {
+  if (!title || !dateLocal || !timeLocal || !durationRaw) {
     return { error: "Please fill all required fields" };
+  }
+
+  if (!Number.isFinite(durationHours)) {
+    return { error: "Duration must be a number" };
+  }
+
+  if (durationHours > SLOT_MAX_HOURS) {
+    return { error: `${SLOT_MAX_HOURS} maximum` };
+  }
+
+  if (durationHours < SLOT_MIN_HOURS) {
+    return { error: `Duration must be at least ${SLOT_MIN_HOURS} hour` };
   }
 
   let startAtIso: string;
   let endAtIso: string;
 
   try {
+    const startLocal = `${dateLocal}T${timeLocal}`;
     startAtIso = localDateTimeToUtcIso(startLocal, offset);
-    endAtIso = localDateTimeToUtcIso(endLocal, offset);
+    endAtIso = new Date(new Date(startAtIso).getTime() + durationHours * 60 * 60 * 1000).toISOString();
     validateSlotDuration(startAtIso, endAtIso);
   } catch (error) {
     return { error: error instanceof Error ? error.message : "Invalid time range" };
