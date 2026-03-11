@@ -43,7 +43,10 @@ async function sendPushAfterCheckIn(payload: { slotId: string; actorId: string; 
     return;
   }
 
-  const endpoint = `${requireEnv("SUPABASE_EDGE_FUNCTION_URL").replace(/\/$/, "")}/send-checkin-push`;
+  const edgeBaseUrl = requireEnv("SUPABASE_EDGE_FUNCTION_URL")
+    .replace(/\/$/, "")
+    .replace(/\/send-checkin-push$/, "");
+  const endpoint = `${edgeBaseUrl}/send-checkin-push`;
 
   const response = await fetch(endpoint, {
     method: "POST",

@@ -1,4 +1,4 @@
-const CACHE_NAME = "linketus-v1";
+const CACHE_NAME = "linketus-v2";
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {
@@ -15,6 +15,12 @@ self.addEventListener("activate", (event) => {
     ),
   );
   self.clients.claim();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("fetch", (event) => {
@@ -36,8 +42,8 @@ self.addEventListener("push", (event) => {
   const title = payload.title || "Linketus";
   const options = {
     body: payload.body || "Новая активность в linket / New linket activity",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
+    icon: "/icon-192-v6.png",
+    badge: "/icon-192-v6.png",
     data: {
       url: payload.url || "/dashboard",
     },

@@ -55,3 +55,15 @@ Linketus is a minimalist social presence PWA built with Next.js + Supabase.
 - Timestamps are stored in UTC and displayed in user local timezone.
 - Participated linkets query uses SQL `DISTINCT slot_id` via `get_participated_slots` function.
 - Deleting a linket cascades to related check-ins.
+
+## PWA update policy
+
+- Installed app should update automatically without manual user actions.
+- Service worker updates are forced via:
+  - `updateViaCache: "none"` on registration,
+  - periodic `registration.update()`,
+  - `controllerchange` reload,
+  - `/api/version` polling.
+- `sw.js`, `manifest.webmanifest`, and active icon files must be served with no-cache headers.
+- Icon changes must use versioned filenames and be referenced from both `app/manifest.ts` and `app/layout.tsx`.
+- iOS caveat: icon of an already installed shortcut can stay stale; reinstall may be required only for icon replacement.
