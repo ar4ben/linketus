@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
     };
   }
 
-  const title = `${slot.title} | Linketus`;
+  const title = slot.title;
   const description = `Start: ${formatPreviewStart(slot.start_at)}`;
   const url = `/linket/${slot.id}`;
 
