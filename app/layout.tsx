@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 
 import { signOut } from "@/app/actions";
 import { AuthSessionGuard } from "@/components/auth-session-guard";
@@ -90,6 +91,7 @@ export default async function RootLayout({
           vapidPublicKey={env.pushPublicKey}
           strings={strings.push}
         />
+        <Analytics />
       </body>
     </html>
   );
