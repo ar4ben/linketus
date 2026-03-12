@@ -35,9 +35,12 @@ export function DashboardFeed({ items, locale, dashboardStrings, slotStrings }: 
         return (
           <li
             key={slot.id}
-            className="rounded-3xl border border-border/80 bg-card px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.5)] transition hover:shadow-[0_14px_28px_-22px_rgba(32,29,26,0.55)]"
+            className="rounded-3xl border border-border/80 bg-card shadow-[0_10px_24px_-20px_rgba(32,29,26,0.5)] transition hover:shadow-[0_14px_28px_-22px_rgba(32,29,26,0.55)]"
           >
-            <Link href={`/linket/${slot.id}`} className="block">
+            <Link
+              href={`/linket/${slot.id}`}
+              className="block rounded-3xl px-4 py-3.5 transition duration-100 ease-out active:scale-[0.99] active:bg-muted/60"
+            >
               <div className="flex flex-wrap items-center gap-2.5">
                 <span
                   aria-hidden
