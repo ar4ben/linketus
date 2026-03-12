@@ -57,6 +57,7 @@ export function SlotClient({
   const [canViewParticipants, setCanViewParticipants] = useState(hasJoined);
   const [actionError, setActionError] = useState<string | null>(null);
   const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
+  const [pendingEmoji, setPendingEmoji] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const state = useMemo(
@@ -151,23 +152,29 @@ export function SlotClient({
   }, [supabase, slot.id, currentUserId, canViewParticipants, strings.someone, strings.toastCheckedIn]);
 
   async function onCheckIn(emoji: string) {
+    setPendingEmoji(emoji);
+
     startTransition(async () => {
-      const formData = new FormData();
-      formData.set("slot_id", slot.id);
-      formData.set("emoji", emoji);
+      try {
+        const formData = new FormData();
+        formData.set("slot_id", slot.id);
+        formData.set("emoji", emoji);
 
-      const result = await checkInAction({ error: null }, formData);
+        const result = await checkInAction({ error: null }, formData);
 
-      if (result.error) {
-        setActionError(result.error);
-        toast.error(result.error);
-        return;
+        if (result.error) {
+          setActionError(result.error);
+          toast.error(result.error);
+          return;
+        }
+
+        setActionError(null);
+        setCooldownUntil(Date.now() + 60_000);
+        setCanViewParticipants(true);
+        router.refresh();
+      } finally {
+        setPendingEmoji(null);
       }
-
-      setActionError(null);
-      setCooldownUntil(Date.now() + 60_000);
-      setCanViewParticipants(true);
-      router.refresh();
     });
   }
 
@@ -233,7 +240,14 @@ export function SlotClient({
                   className="touch-manipulation rounded-2xl border border-border/80 bg-background p-2 text-xl transition-[transform,background-color,color,opacity] duration-100 ease-out hover:bg-muted active:scale-[0.96] active:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`${strings.emojiAriaPrefix} ${emoji}`}
                 >
-                  {emoji}
+                  {isPending && pendingEmoji === emoji ? (
+                    <span
+                      aria-hidden
+                      className="mx-auto inline-block size-5 rounded-full border-2 border-foreground/25 border-t-foreground animate-spin"
+                    />
+                  ) : (
+                    emoji
+                  )}
                 </button>
               ))}
             </div>
