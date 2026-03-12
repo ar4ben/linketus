@@ -39,15 +39,19 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("push", (event) => {
   const payload = event.data ? event.data.json() : {};
-  const title = payload.title || "Linketus";
+  const title = typeof payload.title === "string" && payload.title.trim() ? payload.title : "Linketus";
+  const body = typeof payload.body === "string" ? payload.body : "";
   const options = {
-    body: payload.body || "Новая активность в linket / New linket activity",
     icon: "/icon-192-v6.png",
     badge: "/icon-192-v6.png",
     data: {
       url: payload.url || "/dashboard",
     },
   };
+
+  if (body) {
+    options.body = body;
+  }
 
   event.waitUntil(self.registration.showNotification(title, options));
 });

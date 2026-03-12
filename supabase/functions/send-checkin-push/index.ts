@@ -179,8 +179,8 @@ Deno.serve(async (request) => {
   webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
   const notificationBody = JSON.stringify({
-    title: "Linketus",
-    body: `${actorName} отметился ${payload.emoji} в linket \"${slot.title}\" / ${actorName} checked in ${payload.emoji} in \"${slot.title}\"`,
+    title: `${slot.title}: ${actorName}${payload.emoji}`,
+    body: "",
     url: `/linket/${slot.id}`,
   });
 
