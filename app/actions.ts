@@ -53,6 +53,7 @@ async function sendPushAfterCheckIn(payload: {
     .replace(/\/send-checkin-push$/, "");
   const endpoint = `${edgeBaseUrl}/send-checkin-push`;
   const anonKey = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  const internalToken = requireEnv("PUSH_INTERNAL_TOKEN").trim();
   const authorizationToken = payload.accessToken?.trim() || requireEnv("SUPABASE_SERVICE_ROLE_KEY");
 
   const response = await fetch(endpoint, {
@@ -61,6 +62,7 @@ async function sendPushAfterCheckIn(payload: {
       "Content-Type": "application/json",
       apikey: anonKey,
       Authorization: `Bearer ${authorizationToken}`,
+      "x-internal-token": internalToken,
     },
     body: JSON.stringify({
       slot_id: payload.slotId,

@@ -3,7 +3,7 @@ import webpush, { type PushSubscription } from "npm:web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-internal-token",
 };
 
 type RequestPayload = {
@@ -32,10 +32,49 @@ Deno.serve(async (request) => {
   const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
   const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY");
   const vapidSubject = Deno.env.get("VAPID_SUBJECT") ?? "mailto:hello@example.com";
+  const internalToken = Deno.env.get("PUSH_INTERNAL_TOKEN");
 
-  if (!supabaseUrl || !serviceRoleKey || !vapidPublicKey || !vapidPrivateKey) {
+  if (!supabaseUrl || !serviceRoleKey || !vapidPublicKey || !vapidPrivateKey || !internalToken) {
     return new Response(JSON.stringify({ error: "Missing function environment variables" }), {
       status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+    },
+  });
+
+  const expectedToken = internalToken.trim();
+  const requestToken = request.headers.get("x-internal-token")?.trim();
+  const bearer = request.headers.get("authorization");
+  const accessToken =
+    bearer && bearer.toLowerCase().startsWith("bearer ") ? bearer.slice("Bearer ".length).trim() : null;
+
+  let authenticatedUserId: string | null = null;
+  if (accessToken) {
+    const { data: authData, error: authError } = await supabase.auth.getUser(accessToken);
+    if (!authError) {
+      authenticatedUserId = authData.user?.id ?? null;
+    }
+  }
+
+  const internalTokenValid = Boolean(requestToken && requestToken === expectedToken);
+  if (!internalTokenValid && !authenticatedUserId) {
+    if (requestToken) {
+      console.warn("Invalid internal token", {
+        request_prefix: requestToken.slice(0, 8),
+        expected_prefix: expectedToken.slice(0, 8),
+      });
+    }
+
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
       headers: {
         ...corsHeaders,
         "Content-Type": "application/json",
@@ -55,11 +94,15 @@ Deno.serve(async (request) => {
     });
   }
 
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-    },
-  });
+  if (authenticatedUserId && authenticatedUserId !== payload.actor_id) {
+    return new Response(JSON.stringify({ error: "Actor mismatch" }), {
+      status: 403,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
   const { data: slot, error: slotError } = await supabase
     .from("slots")
@@ -150,10 +193,19 @@ Deno.serve(async (request) => {
         );
       } catch (error) {
         const statusCode = (error as { statusCode?: number }).statusCode;
+        const message = error instanceof Error ? error.message : String(error);
 
         if (statusCode === 404 || statusCode === 410) {
           await supabase.from("push_subscriptions").delete().eq("id", subscriptionRow.id);
         }
+
+        console.error("Push delivery failed", {
+          slot_id: payload.slot_id,
+          user_id: subscriptionRow.user_id,
+          subscription_id: subscriptionRow.id,
+          status_code: statusCode ?? null,
+          message,
+        });
 
         throw error;
       }
@@ -162,6 +214,15 @@ Deno.serve(async (request) => {
 
   const delivered = results.filter((result) => result.status === "fulfilled").length;
   const failed = results.length - delivered;
+
+  console.log("Push delivery summary", {
+    slot_id: payload.slot_id,
+    actor_id: payload.actor_id,
+    recipients: participantIds.size,
+    subscriptions: (subscriptions ?? []).length,
+    delivered,
+    failed,
+  });
 
   return new Response(JSON.stringify({ ok: true, delivered, failed }), {
     headers: {

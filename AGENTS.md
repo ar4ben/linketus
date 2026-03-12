@@ -23,3 +23,12 @@
 
 - iOS may keep the icon for an already installed home-screen shortcut.
 - Code/content updates should apply automatically, but icon replacement may still require reinstalling the shortcut.
+
+## Push Security Rules (Do Not Break)
+
+- `send-checkin-push` is deployed with `--no-verify-jwt`.
+- Function must be protected by shared secret header `x-internal-token`.
+- App sends `x-internal-token` from `PUSH_INTERNAL_TOKEN`.
+- `PUSH_INTERNAL_TOKEN` must be configured in both:
+  - Next.js runtime env,
+  - Supabase function secrets.

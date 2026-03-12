@@ -32,18 +32,25 @@ Linketus is a minimalist social presence PWA built with Next.js + Supabase.
 ## Push notifications
 
 1. Generate VAPID keys.
-2. Deploy edge function:
-   - `supabase functions deploy send-checkin-push`
-3. Set edge function secrets:
+2. Create shared internal token (any long random string) for app -> edge auth.
+3. Deploy edge function without JWT gateway verification:
+   - `supabase functions deploy send-checkin-push --no-verify-jwt`
+4. Set edge function secrets:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `VAPID_PUBLIC_KEY`
    - `VAPID_PRIVATE_KEY`
    - `VAPID_SUBJECT`
-4. Set app env vars:
+   - `PUSH_INTERNAL_TOKEN`
+5. Set app env vars:
    - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
    - `SUPABASE_EDGE_FUNCTION_URL` (for example `https://<project-ref>.functions.supabase.co`)
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `PUSH_INTERNAL_TOKEN`
+
+Notes:
+- `SUPABASE_EDGE_FUNCTION_URL` should not include `/send-checkin-push`.
+- Function invocation is protected by `x-internal-token` header.
 
 ## Checks
 
