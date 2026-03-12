@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { signInWithGoogle, signOut } from "@/app/actions";
+import { signOut } from "@/app/actions";
 import { ChunkErrorReloader } from "@/components/chunk-error-reloader";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { PushSubscriptionManager } from "@/components/push-subscription-manager";
@@ -70,11 +70,11 @@ export default async function RootLayout({
                   </Button>
                 </form>
               ) : (
-                <form action={signInWithGoogle}>
-                  <Button type="submit" size="sm">
+                <Button asChild size="sm">
+                  <Link href="/signin">
                     {strings.nav.signIn}
-                  </Button>
-                </form>
+                  </Link>
+                </Button>
               )}
             </div>
           </div>

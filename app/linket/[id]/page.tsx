@@ -48,7 +48,7 @@ export default async function SlotPage({ params }: SlotPageProps) {
   }
 
   const deleteAction = deleteSlotAction.bind(null, slot.id);
-  const signInUrl = `/auth/signin?next=${encodeURIComponent(`/linket/${id}`)}`;
+  const signInUrl = `/signin?next=${encodeURIComponent(`/linket/${id}`)}`;
 
   return (
     <section className="space-y-4">

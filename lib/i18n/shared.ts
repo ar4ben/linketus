@@ -34,6 +34,14 @@ export const dictionary = {
       signIn: "Sign in",
       language: "Language",
     },
+    auth: {
+      title: "Sign in",
+      subtitle: "Use Google to continue in Linketus.",
+      continueWithGoogle: "Continue with Google",
+      legalLinksLabel: "By continuing, you agree to:",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+    },
     dashboard: {
       title: "My linkets",
       mySlots: "My linkets",
@@ -103,6 +111,24 @@ export const dictionary = {
       enabling: "Enabling...",
       blocked: "Notifications are blocked for this app in system settings.",
     },
+    legal: {
+      privacyTitle: "Privacy Policy",
+      privacyLastUpdated: "Last updated: March 12, 2026",
+      privacyP1:
+        "Linketus stores only the data needed to run linkets: your basic profile, linkets you create, check-ins, and push subscriptions.",
+      privacyP2:
+        "Linketus does not sell your data and does not use your data for advertising. We use Google sign-in only for authentication.",
+      privacyP3:
+        "If you want your data removed, contact the Linketus support email and include your account identifier.",
+      termsTitle: "Terms of Service",
+      termsLastUpdated: "Last updated: March 12, 2026",
+      termsP1:
+        "Linketus is provided as-is to help people share presence through linkets. You are responsible for how you use the app.",
+      termsP2:
+        "Do not use Linketus for abuse, illegal activity, or harmful content. We may suspend access for misuse.",
+      termsP3:
+        "The service may change over time. Continued use means you accept the latest version of these terms.",
+    },
   },
   ru: {
     appName: "Linketus",
@@ -125,6 +151,14 @@ export const dictionary = {
       signOut: "Выйти",
       signIn: "Войти",
       language: "Язык",
+    },
+    auth: {
+      title: "Вход",
+      subtitle: "Используйте Google, чтобы продолжить в Linketus.",
+      continueWithGoogle: "Продолжить через Google",
+      legalLinksLabel: "Продолжая, вы соглашаетесь с:",
+      privacy: "Политикой конфиденциальности",
+      terms: "Условиями использования",
     },
     dashboard: {
       title: "Мои linkets",
@@ -194,6 +228,24 @@ export const dictionary = {
       enable: "Включить уведомления",
       enabling: "Включаем...",
       blocked: "Уведомления для этого приложения заблокированы в системных настройках.",
+    },
+    legal: {
+      privacyTitle: "Политика конфиденциальности",
+      privacyLastUpdated: "Последнее обновление: 12 марта 2026",
+      privacyP1:
+        "Linketus хранит только данные, необходимые для работы linkets: базовый профиль, созданные linkets, отметки активности и push-подписки.",
+      privacyP2:
+        "Linketus не продает ваши данные и не использует их для рекламы. Вход через Google используется только для авторизации.",
+      privacyP3:
+        "Если вы хотите удалить свои данные, напишите в поддержку Linketus и укажите идентификатор аккаунта.",
+      termsTitle: "Условия использования",
+      termsLastUpdated: "Последнее обновление: 12 марта 2026",
+      termsP1:
+        "Linketus предоставляется «как есть» для совместного присутствия через linkets. Вы несете ответственность за использование приложения.",
+      termsP2:
+        "Запрещено использовать Linketus для злоупотреблений, незаконной активности или вредоносного контента. За нарушения доступ может быть ограничен.",
+      termsP3:
+        "Сервис может меняться со временем. Продолжая использовать сервис, вы принимаете актуальную версию условий.",
     },
   },
 } as const;

@@ -1,4 +1,5 @@
-import { signInWithGoogle } from "@/app/actions";
+import Link from "next/link";
+
 import { CreateSlotForm } from "@/components/create-slot-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,9 +24,9 @@ export default async function NewSlotPage() {
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-muted-foreground">{strings.createSlot.authRequired}</p>
-          <form action={signInWithGoogle}>
-            <Button type="submit">{strings.home.signIn}</Button>
-          </form>
+          <Button asChild>
+            <Link href="/signin?next=%2Flinket%2Fnew">{strings.home.signIn}</Link>
+          </Button>
         </CardContent>
       </Card>
     );

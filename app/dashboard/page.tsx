@@ -1,4 +1,5 @@
-import { signInWithGoogle } from "@/app/actions";
+import Link from "next/link";
+
 import { DashboardFeed } from "@/components/dashboard-feed";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,9 +25,9 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-muted-foreground">{strings.createSlot.authRequired}</p>
-          <form action={signInWithGoogle}>
-            <Button type="submit">{strings.home.signIn}</Button>
-          </form>
+          <Button asChild>
+            <Link href="/signin?next=%2Fdashboard">{strings.home.signIn}</Link>
+          </Button>
         </CardContent>
       </Card>
     );
