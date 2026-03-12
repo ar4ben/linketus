@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -19,6 +19,12 @@ function urlBase64ToUint8Array(base64String: string) {
 type PushSubscriptionManagerProps = {
   vapidPublicKey?: string;
   enabled: boolean;
+  strings: {
+    prompt: string;
+    enable: string;
+    enabling: string;
+    blocked: string;
+  };
 };
 
 async function getBuildVersion() {
@@ -37,7 +43,22 @@ async function getBuildVersion() {
   return payload.version ?? null;
 }
 
-export function PushSubscriptionManager({ vapidPublicKey, enabled }: PushSubscriptionManagerProps) {
+export function PushSubscriptionManager({ vapidPublicKey, enabled, strings }: PushSubscriptionManagerProps) {
+  const [isPushSupported, setIsPushSupported] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission | "unsupported">("unsupported");
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [isEnabling, setIsEnabling] = useState(false);
+
+  async function persistSubscription(subscription: PushSubscription) {
+    await fetch("/api/push/subscription", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(subscription),
+    });
+  }
+
   useEffect(() => {
     let cancelled = false;
     let knownBuildVersion: string | null = null;
@@ -127,39 +148,30 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled }: PushSubscri
         void checkForBuildUpdate();
       }, 60_000);
 
-      if (!enabled || !vapidPublicKey || !("PushManager" in window) || !("Notification" in window)) {
+      const supported = "PushManager" in window && "Notification" in window;
+      setIsPushSupported(supported);
+
+      if (!supported) {
+        setPermission("unsupported");
+        setHasSubscription(false);
         return;
       }
 
-      if (Notification.permission === "default") {
-        await Notification.requestPermission();
-      }
+      setPermission(Notification.permission);
 
-      if (Notification.permission !== "granted") {
+      if (!enabled || !vapidPublicKey || Notification.permission !== "granted") {
         return;
       }
 
       const ready = await navigator.serviceWorker.ready;
-      let subscription = await ready.pushManager.getSubscription();
-
-      if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-        });
-      }
+      const subscription = await ready.pushManager.getSubscription();
+      setHasSubscription(Boolean(subscription));
 
       if (cancelled || !subscription) {
         return;
       }
 
-      await fetch("/api/push/subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(subscription),
-      });
+      await persistSubscription(subscription);
     }
 
     void setup();
@@ -175,5 +187,80 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled }: PushSubscri
     };
   }, [enabled, vapidPublicKey]);
 
-  return null;
+  async function onEnableNotifications() {
+    if (
+      !enabled ||
+      !vapidPublicKey ||
+      !("serviceWorker" in navigator) ||
+      !("PushManager" in window) ||
+      !("Notification" in window)
+    ) {
+      return;
+    }
+
+    setIsEnabling(true);
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      let nextPermission = Notification.permission;
+
+      if (nextPermission === "default") {
+        nextPermission = await Notification.requestPermission();
+      }
+
+      setPermission(nextPermission);
+
+      if (nextPermission !== "granted") {
+        return;
+      }
+
+      let subscription = await registration.pushManager.getSubscription();
+
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+        });
+      }
+
+      if (!subscription) {
+        return;
+      }
+
+      await persistSubscription(subscription);
+      setHasSubscription(true);
+    } catch (error) {
+      console.error("Push enable failed", error);
+    } finally {
+      setIsEnabling(false);
+    }
+  }
+
+  if (!enabled || !vapidPublicKey || !isPushSupported) {
+    return null;
+  }
+
+  if (permission === "granted" && hasSubscription) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-x-0 bottom-3 z-40 flex justify-center px-4 sm:bottom-4">
+      <div className="w-full max-w-md rounded-2xl border border-border/80 bg-card/95 p-3 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.65)] backdrop-blur">
+        <p className="text-sm text-foreground">{strings.prompt}</p>
+        {permission === "denied" ? (
+          <p className="mt-2 text-xs text-muted-foreground">{strings.blocked}</p>
+        ) : (
+          <button
+            type="button"
+            onClick={onEnableNotifications}
+            disabled={isEnabling}
+            className="mt-2 inline-flex h-9 items-center justify-center rounded-xl bg-primary px-3 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isEnabling ? strings.enabling : strings.enable}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }

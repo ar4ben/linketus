@@ -97,6 +97,12 @@ export const dictionary = {
       title: "Offline",
       description: "Linketus is currently offline. Reconnect to load live linket updates.",
     },
+    push: {
+      prompt: "Enable notifications to get live linket activity",
+      enable: "Enable notifications",
+      enabling: "Enabling...",
+      blocked: "Notifications are blocked for this app in system settings.",
+    },
   },
   ru: {
     appName: "Linketus",
@@ -182,6 +188,12 @@ export const dictionary = {
     offline: {
       title: "Офлайн",
       description: "Linketus сейчас офлайн. Подключитесь к сети, чтобы видеть активность linket в реальном времени.",
+    },
+    push: {
+      prompt: "Включите уведомления, чтобы получать активность linket в реальном времени",
+      enable: "Включить уведомления",
+      enabling: "Включаем...",
+      blocked: "Уведомления для этого приложения заблокированы в системных настройках.",
     },
   },
 } as const;

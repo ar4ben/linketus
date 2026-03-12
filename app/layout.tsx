@@ -81,7 +81,11 @@ export default async function RootLayout({
 
         <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-10">{children}</main>
         <Toaster richColors position="top-right" />
-        <PushSubscriptionManager enabled={Boolean(user)} vapidPublicKey={env.pushPublicKey} />
+        <PushSubscriptionManager
+          enabled={Boolean(user)}
+          vapidPublicKey={env.pushPublicKey}
+          strings={strings.push}
+        />
       </body>
     </html>
   );
