@@ -69,7 +69,7 @@ describe("linket page metadata", () => {
 
     expect(metadata.openGraph).toMatchObject({
       title: "Daily standup",
-      description: "",
+      description: "Daily standup",
       type: "website",
       url: "/linket/slot-123",
       siteName: "Linketus",
@@ -79,7 +79,7 @@ describe("linket page metadata", () => {
     expect(metadata.twitter).toEqual({
       card: "summary",
       title: "Daily standup",
-      description: "",
+      description: "Daily standup",
     });
   });
 
