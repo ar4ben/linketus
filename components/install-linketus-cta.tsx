@@ -83,7 +83,7 @@ export function InstallLinketusCta({ ctaText, iosTitle, iosBody }: InstallLinket
       <button
         type="button"
         onClick={onInstallClick}
-        className="flex items-center gap-3 rounded-2xl border border-input bg-card px-5 py-3 text-center text-base font-semibold text-foreground shadow-[0_10px_24px_-20px_rgba(32,29,26,0.6)] transition hover:bg-muted/50"
+        className="flex touch-manipulation items-center gap-3 rounded-2xl border border-input bg-card px-5 py-3 text-center text-base font-semibold text-foreground shadow-[0_10px_24px_-20px_rgba(32,29,26,0.6)] transition-[transform,background-color,color,opacity,box-shadow] duration-100 ease-out hover:bg-muted/50 active:scale-[0.98] active:bg-muted/70"
       >
         <SquarePlus className="size-9 text-emerald-600" />
         <span>{ctaText}</span>

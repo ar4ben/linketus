@@ -230,7 +230,7 @@ export function SlotClient({
                   type="button"
                   onClick={() => onCheckIn(emoji)}
                   disabled={!canCheckIn}
-                  className="rounded-2xl border border-border/80 bg-background p-2 text-xl transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                  className="touch-manipulation rounded-2xl border border-border/80 bg-background p-2 text-xl transition-[transform,background-color,color,opacity] duration-100 ease-out hover:bg-muted active:scale-[0.96] active:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`${strings.emojiAriaPrefix} ${emoji}`}
                 >
                   {emoji}

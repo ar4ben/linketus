@@ -255,7 +255,7 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled, strings }: Pu
             type="button"
             onClick={onEnableNotifications}
             disabled={isEnabling}
-            className="mt-2 inline-flex h-9 items-center justify-center rounded-xl bg-primary px-3 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 inline-flex h-9 touch-manipulation items-center justify-center rounded-xl bg-primary px-3 text-sm font-medium text-primary-foreground transition-[transform,background-color,color,opacity] duration-100 ease-out hover:opacity-90 active:scale-[0.98] active:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isEnabling ? strings.enabling : strings.enable}
           </button>
