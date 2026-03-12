@@ -83,11 +83,16 @@ export function SlotClient({
   const canCheckIn = Boolean(currentUserId) && state === "active" && cooldownSeconds === 0 && !isPending;
   const checkInTitle = !currentUserId
     ? strings.loginToCheckIn
-    : currentUserId && canViewParticipants
+    : canViewParticipants
       ? strings.joined
-      : strings.checkIn;
+      : state === "waiting"
+        ? strings.waitingToStart
+        : state === "active"
+          ? strings.markPresence
+          : strings.checkIn;
 
   useEffect(() => {
+    setNow(Date.now());
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(interval);
   }, []);

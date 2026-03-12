@@ -57,6 +57,18 @@ function buildSlot(): Slot {
   };
 }
 
+function buildWaitingSlot(): Slot {
+  const now = Date.now();
+  return {
+    id: "slot-2",
+    creator_id: "creator-1",
+    title: "Future linket",
+    start_at: new Date(now + 60 * 60 * 1000).toISOString(),
+    end_at: new Date(now + 2 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(now).toISOString(),
+  };
+}
+
 function renderSlotClient(overrides?: Partial<ComponentProps<typeof SlotClient>>) {
   const strings = getDictionary("en").slot;
   return render(
@@ -119,9 +131,25 @@ describe("SlotClient", () => {
       hasJoined: false,
     });
 
-    expect(screen.getByRole("heading", { name: "Join this linket with an emoji:" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Mark your presence with an emoji:" })).toBeInTheDocument();
     expect(screen.getByText("Join to see activity")).toBeInTheDocument();
     expect(supabaseChannel).not.toHaveBeenCalled();
+  });
+
+  it("shows waiting guidance text for authenticated users before start", () => {
+    renderSlotClient({
+      slot: buildWaitingSlot(),
+      currentUserId: "user-1",
+      hasJoined: false,
+    });
+
+    return waitFor(() => {
+      expect(
+        screen.getByRole("heading", {
+          name: "This linket hasn’t started yet. Check back when it begins.",
+        }),
+      ).toBeInTheDocument();
+    });
   });
 
   it("renders joined state and subscribes to realtime feed", async () => {
