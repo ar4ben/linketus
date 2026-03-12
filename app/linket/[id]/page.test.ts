@@ -52,7 +52,7 @@ describe("linket page metadata", () => {
     getSlotByIdMock.mockReset();
   });
 
-  it("builds social metadata with only title and icon image", async () => {
+  it("builds social metadata with only title and no preview image", async () => {
     getSlotByIdMock.mockResolvedValue({
       id: "slot-123",
       title: "Daily standup",
@@ -74,20 +74,12 @@ describe("linket page metadata", () => {
       url: "/linket/slot-123",
       siteName: "Linketus",
     });
-    expect(metadata.openGraph?.images).toEqual([
-      {
-        url: "/icon-512-v6.png",
-        width: 512,
-        height: 512,
-        alt: "Linketus",
-      },
-    ]);
+    expect(metadata.openGraph?.images).toBeUndefined();
 
     expect(metadata.twitter).toEqual({
-      card: "summary_large_image",
+      card: "summary",
       title: "Daily standup",
       description: "",
-      images: ["/icon-512-v6.png"],
     });
   });
 
