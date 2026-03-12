@@ -52,7 +52,7 @@ describe("linket page metadata", () => {
     getSlotByIdMock.mockReset();
   });
 
-  it("builds social metadata with only title and no preview image", async () => {
+  it("builds social metadata exactly as text-only preview config", async () => {
     getSlotByIdMock.mockResolvedValue({
       id: "slot-123",
       title: "Daily standup",
@@ -69,7 +69,7 @@ describe("linket page metadata", () => {
 
     expect(metadata.openGraph).toMatchObject({
       title: "Daily standup",
-      description: "Daily standup",
+      description: "",
       type: "website",
       url: "/linket/slot-123",
       siteName: "Linketus",
@@ -79,7 +79,7 @@ describe("linket page metadata", () => {
     expect(metadata.twitter).toEqual({
       card: "summary",
       title: "Daily standup",
-      description: "Daily standup",
+      description: "",
     });
   });
 

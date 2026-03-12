@@ -32,7 +32,6 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
 
   const title = slot.title;
   const url = `/linket/${slot.id}`;
-  const socialDescription = title;
 
   return {
     title,
@@ -42,7 +41,7 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
     },
     openGraph: {
       title,
-      description: socialDescription,
+      description: "",
       type: "website",
       url,
       siteName: "Linketus",
@@ -50,7 +49,7 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
     twitter: {
       card: "summary",
       title,
-      description: socialDescription,
+      description: "",
     },
   };
 }
