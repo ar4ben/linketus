@@ -2,19 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const getSlotByIdMock = vi.fn();
 
-function formatPreviewStart(iso: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(new Date(iso));
-}
-
 vi.mock("next/navigation", () => ({
   notFound: vi.fn(),
 }));
@@ -65,14 +52,10 @@ describe("linket page metadata", () => {
     getSlotByIdMock.mockReset();
   });
 
-  it("builds social metadata as in 42069db preview config", async () => {
-    const startAt = "2026-03-12T10:00:00.000Z";
-    const expectedDescription = `Start: ${formatPreviewStart(startAt)}`;
-
+  it("builds social metadata without Start and without title suffix", async () => {
     getSlotByIdMock.mockResolvedValue({
       id: "slot-123",
       title: "Daily standup",
-      start_at: startAt,
     });
 
     const metadata = await generateMetadata({
@@ -80,13 +63,13 @@ describe("linket page metadata", () => {
     });
 
     expect(getSlotByIdMock).toHaveBeenCalledWith("slot-123");
-    expect(metadata.title).toBe("Daily standup | Linketus");
-    expect(metadata.description).toBe(expectedDescription);
+    expect(metadata.title).toBe("Daily standup");
+    expect(metadata.description).toBe("");
     expect(metadata.alternates?.canonical).toBe("/linket/slot-123");
 
     expect(metadata.openGraph).toMatchObject({
-      title: "Daily standup | Linketus",
-      description: expectedDescription,
+      title: "Daily standup",
+      description: "Daily standup",
       type: "website",
       url: "/linket/slot-123",
       siteName: "Linketus",
@@ -95,8 +78,8 @@ describe("linket page metadata", () => {
 
     expect(metadata.twitter).toEqual({
       card: "summary",
-      title: "Daily standup | Linketus",
-      description: expectedDescription,
+      title: "Daily standup",
+      description: "Daily standup",
     });
   });
 
