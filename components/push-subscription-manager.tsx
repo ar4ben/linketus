@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { createClient } from "@/lib/supabase/client";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -48,16 +50,61 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled, strings }: Pu
   const [permission, setPermission] = useState<NotificationPermission | "unsupported">("unsupported");
   const [hasSubscription, setHasSubscription] = useState(false);
   const [isEnabling, setIsEnabling] = useState(false);
+  const supabase = useMemo(() => createClient(), []);
+  const inFlightRefresh = useRef<Promise<boolean> | null>(null);
 
-  async function persistSubscription(subscription: PushSubscription) {
-    await fetch("/api/push/subscription", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(subscription),
-    });
-  }
+  const refreshSessionOnce = useMemo(
+    () => async () => {
+      if (inFlightRefresh.current) {
+        return inFlightRefresh.current;
+      }
+
+      inFlightRefresh.current = (async () => {
+        const { data, error } = await supabase.auth.refreshSession();
+        if (error || !data.session) {
+          return false;
+        }
+
+        return true;
+      })().finally(() => {
+        inFlightRefresh.current = null;
+      });
+
+      return inFlightRefresh.current;
+    },
+    [supabase.auth],
+  );
+
+  const postSubscription = useMemo(
+    () => async (subscription: PushSubscription) =>
+      fetch("/api/push/subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(subscription),
+      }),
+    [],
+  );
+
+  const persistSubscription = useMemo(
+    () => async (subscription: PushSubscription) => {
+      let response = await postSubscription(subscription);
+
+      if (response.status === 401) {
+        const refreshed = await refreshSessionOnce();
+        if (refreshed) {
+          response = await postSubscription(subscription);
+        }
+      }
+
+      if (!response.ok) {
+        const payload = await response.text().catch(() => "");
+        throw new Error(`Push subscription persist failed: ${response.status} ${payload}`);
+      }
+    },
+    [postSubscription, refreshSessionOnce],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -171,7 +218,11 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled, strings }: Pu
         return;
       }
 
-      await persistSubscription(subscription);
+      try {
+        await persistSubscription(subscription);
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     void setup();
@@ -185,7 +236,7 @@ export function PushSubscriptionManager({ vapidPublicKey, enabled, strings }: Pu
       removeControllerChangeListener?.();
       removeUpdateFoundListener?.();
     };
-  }, [enabled, vapidPublicKey]);
+  }, [enabled, persistSubscription, vapidPublicKey]);
 
   async function onEnableNotifications() {
     if (
