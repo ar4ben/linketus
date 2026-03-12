@@ -37,22 +37,22 @@ export function DashboardFeed({ items, locale, dashboardStrings, slotStrings }: 
             key={slot.id}
             className="rounded-3xl border border-border/80 bg-card px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(32,29,26,0.5)] transition hover:shadow-[0_14px_28px_-22px_rgba(32,29,26,0.55)]"
           >
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span
-                aria-hidden
-                className={`inline-block size-2.5 rounded-full ${dotStyles[state]}`}
-              />
-              <Link href={`/linket/${slot.id}`} className="text-base font-semibold hover:underline">
-                {slot.title}
-              </Link>
-            </div>
+            <Link href={`/linket/${slot.id}`} className="block">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className={`inline-block size-2.5 rounded-full ${dotStyles[state]}`}
+                />
+                <span className="text-base font-semibold hover:underline">{slot.title}</span>
+              </div>
 
-            <p className="mt-1 text-xs font-medium text-muted-foreground">{slotStrings[state]}</p>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">{slotStrings[state]}</p>
 
-            <p className="mt-2 rounded-2xl bg-muted/65 px-2.5 py-1 text-xs text-muted-foreground">
-              <LocalDateTime iso={slot.start_at} locale={locale} /> -{" "}
-              <LocalDateTime iso={slot.end_at} locale={locale} />
-            </p>
+              <p className="mt-2 rounded-2xl bg-muted/65 px-2.5 py-1 text-xs text-muted-foreground">
+                <LocalDateTime iso={slot.start_at} locale={locale} /> -{" "}
+                <LocalDateTime iso={slot.end_at} locale={locale} />
+              </p>
+            </Link>
           </li>
         );
       })}

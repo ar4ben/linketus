@@ -80,7 +80,11 @@ export function SlotClient({
 
   const cooldownSeconds = cooldownUntil ? Math.max(0, Math.ceil((cooldownUntil - now) / 1000)) : 0;
   const canCheckIn = Boolean(currentUserId) && state === "active" && cooldownSeconds === 0 && !isPending;
-  const checkInTitle = currentUserId && canViewParticipants ? strings.joined : strings.checkIn;
+  const checkInTitle = !currentUserId
+    ? strings.loginToCheckIn
+    : currentUserId && canViewParticipants
+      ? strings.joined
+      : strings.checkIn;
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 1000);
@@ -204,8 +208,7 @@ export function SlotClient({
         <h2 className="text-lg font-medium">{checkInTitle}</h2>
 
         {!currentUserId ? (
-          <div className="mt-2 space-y-3">
-            <p className="text-sm text-muted-foreground">{strings.loginToCheckIn}</p>
+          <div className="mt-3">
             <Button asChild size="sm">
               <Link href={signInUrl}>{signInLabel}</Link>
             </Button>

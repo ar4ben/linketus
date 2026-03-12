@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { signInWithGoogle, signOut } from "@/app/actions";
+import { ChunkErrorReloader } from "@/components/chunk-error-reloader";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { PushSubscriptionManager } from "@/components/push-subscription-manager";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,7 @@ export default async function RootLayout({
 
         <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:py-10">{children}</main>
         <Toaster richColors position="top-right" />
+        <ChunkErrorReloader />
         <PushSubscriptionManager
           enabled={Boolean(user)}
           vapidPublicKey={env.pushPublicKey}
