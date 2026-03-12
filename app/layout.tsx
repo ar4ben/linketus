@@ -16,6 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.siteUrl),
   title: "Linketus",
   description: "Presence over communication / Присутствие важнее общения",
   manifest: "/manifest.webmanifest",

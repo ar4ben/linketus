@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { deleteSlotAction } from "@/app/actions";
@@ -13,6 +14,59 @@ type SlotPageProps = {
     id: string;
   }>;
 };
+
+function formatPreviewStart(iso: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(new Date(iso));
+}
+
+export async function generateMetadata({ params }: SlotPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const slot = await getSlotById(id);
+
+  if (!slot) {
+    return {
+      title: "Linket not found | Linketus",
+      description: "Linket not found.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const title = `${slot.title} | Linketus`;
+  const description = `Start: ${formatPreviewStart(slot.start_at)}`;
+  const url = `/linket/${slot.id}`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url,
+      siteName: "Linketus",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function SlotPage({ params }: SlotPageProps) {
   const { id } = await params;
