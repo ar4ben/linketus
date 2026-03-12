@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const RELOAD_GUARD_KEY = "linketus_chunk_reload_guard_v1";
+export const RELOAD_GUARD_KEY = "linketus_chunk_reload_guard_v1";
 const CHUNK_ERROR_PATTERNS = [
   /chunkloaderror/i,
   /failed to load chunk/i,
@@ -11,7 +11,7 @@ const CHUNK_ERROR_PATTERNS = [
   /\/_next\/static\/chunks\//i,
 ];
 
-function stringifyError(input: unknown): string {
+export function stringifyError(input: unknown): string {
   if (typeof input === "string") {
     return input;
   }
@@ -27,11 +27,11 @@ function stringifyError(input: unknown): string {
   }
 }
 
-function isChunkErrorMessage(message: string): boolean {
+export function isChunkErrorMessage(message: string): boolean {
   return CHUNK_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 }
 
-function isNextStaticAssetTarget(target: EventTarget | null): boolean {
+export function isNextStaticAssetTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) {
     return false;
   }
@@ -47,16 +47,19 @@ function isNextStaticAssetTarget(target: EventTarget | null): boolean {
   return false;
 }
 
-function attemptRecoveryReload() {
-  const currentUrl = window.location.href;
-  const lastAttemptUrl = sessionStorage.getItem(RELOAD_GUARD_KEY);
+export function attemptRecoveryReload(
+  currentUrl: string = window.location.href,
+  storage: Pick<Storage, "getItem" | "setItem"> = sessionStorage,
+  reload: () => void = () => window.location.reload(),
+) {
+  const lastAttemptUrl = storage.getItem(RELOAD_GUARD_KEY);
 
   if (lastAttemptUrl === currentUrl) {
     return;
   }
 
-  sessionStorage.setItem(RELOAD_GUARD_KEY, currentUrl);
-  window.location.reload();
+  storage.setItem(RELOAD_GUARD_KEY, currentUrl);
+  reload();
 }
 
 export function ChunkErrorReloader() {
