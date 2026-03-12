@@ -15,6 +15,19 @@ type SlotPageProps = {
   }>;
 };
 
+function formatPreviewStart(iso: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(new Date(iso));
+}
+
 export async function generateMetadata({ params }: SlotPageProps): Promise<Metadata> {
   const { id } = await params;
   const slot = await getSlotById(id);
@@ -32,11 +45,11 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
 
   const title = slot.title;
   const url = `/linket/${slot.id}`;
-  const socialDescription = title;
+  const socialDescription = `Start: ${formatPreviewStart(slot.start_at)}`;
 
   return {
     title,
-    description: "",
+    description: socialDescription,
     alternates: {
       canonical: url,
     },
