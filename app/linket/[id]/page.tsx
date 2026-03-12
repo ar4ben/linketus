@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
 
   const title = slot.title;
   const url = `/linket/${slot.id}`;
+  const previewImage = "/icon-512-v6.png";
 
   return {
     title,
@@ -45,11 +46,20 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
       type: "website",
       url,
       siteName: "Linketus",
+      images: [
+        {
+          url: previewImage,
+          width: 512,
+          height: 512,
+          alt: "Linketus",
+        },
+      ],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description: "",
+      images: [previewImage],
     },
   };
 }
