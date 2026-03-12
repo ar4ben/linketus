@@ -15,19 +15,6 @@ type SlotPageProps = {
   }>;
 };
 
-function formatPreviewStart(iso: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(new Date(iso));
-}
-
 export async function generateMetadata({ params }: SlotPageProps): Promise<Metadata> {
   const { id } = await params;
   const slot = await getSlotById(id);
@@ -44,18 +31,17 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
   }
 
   const title = slot.title;
-  const description = `Start: ${formatPreviewStart(slot.start_at)}`;
   const url = `/linket/${slot.id}`;
 
   return {
     title,
-    description,
+    description: "",
     alternates: {
       canonical: url,
     },
     openGraph: {
       title,
-      description,
+      description: "",
       type: "website",
       url,
       siteName: "Linketus",
@@ -63,7 +49,7 @@ export async function generateMetadata({ params }: SlotPageProps): Promise<Metad
     twitter: {
       card: "summary",
       title,
-      description,
+      description: "",
     },
   };
 }
